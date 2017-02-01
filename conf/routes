@@ -1,0 +1,9 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+
+# Home page
+GET     /async                      controllers.HomeController.async
+GET     /async2                     controllers.HomeController.async2
+GET     /async3                     controllers.HomeController.async3
