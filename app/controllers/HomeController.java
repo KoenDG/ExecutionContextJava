@@ -2,34 +2,37 @@ package controllers;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
-import akka.actor.ActorSystem;
-import services.LongRunningProcess;
+import akka.actor.ActorRef;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
-import scala.concurrent.ExecutionContext;
+import scala.compat.java8.FutureConverters;
+import services.LongRunningProcess;
+
+import static akka.pattern.Patterns.ask;
 
 /**
  * Made into a demo for this question.
+ * Disclaimer: could not get this to work. See HomeController2 for working solution.
  */
 @Singleton
 public class HomeController extends Controller {
 
-    private final ActorSystem actorSystem;
-
-    /**
-     * Constructor.
-     * @param actorSystem The actorsystem which we're going to use to get the context we defined for Akka.
-     */
-    @Inject
-    public HomeController(final ActorSystem actorSystem) {
-       this.actorSystem = actorSystem;
-    }
+//    private final ActorRef configuredActor;
+//
+//    /**
+//     * Constructor.
+//     * @param configuredActor The ActorRef which we're going to use to get the context we defined for Akka.
+//     */
+//    @Inject
+//    public HomeController(@Named("longcalculation-context") final ActorRef configuredActor) {
+//       this.configuredActor = configuredActor;
+//    }
 
     /**
      * Scenario 1: A single Completeable Future.
@@ -59,15 +62,24 @@ public class HomeController extends Controller {
      * @return asdfasdf
      */
     public CompletionStage<Result> async3() {
-        // Does not work if I use play.akka.actor.my-context
-        // PLay documentation recommended I use play.akka instead of akka.*, but that did not work
-        // https://www.playframework.com/documentation/2.5.x/ConfigFile
-        final ExecutionContext myExecutionContext = this.actorSystem.dispatchers().lookup("akka.actor.my-context");
+//        // Doesn't work, immediately returns {"cancelled":false,"done":false,"completedExceptionally":false,"numberOfDependents":0}
+//        final CompletionStage<Object> integerPromise = FutureConverters.toJava(ask(this.configuredActor, CompletableFuture.supplyAsync(() -> LongRunningProcess.run(10000L)), 15000));
+//
+//        // Doesn't work asynchronously
+//        final CompletionStage<Object> integerPromise2 = FutureConverters.toJava(ask(this.configuredActor, LongRunningProcess.run(10000L), 15000));
 
-        final CompletionStage<Integer> integerPromise = CompletableFuture.supplyAsync(() -> LongRunningProcess.run(10000L), (Executor) myExecutionContext);
 
-        final CompletionStage<Integer> integerPromise2 = CompletableFuture.supplyAsync(() -> LongRunningProcess.run(10000L), (Executor) myExecutionContext);
+        // Doesnt work, immediately returns {"empty":true,"traversableAgain":true}
+//        final CompletableFuture<Integer> supplyAsync = CompletableFuture.supplyAsync(() -> LongRunningProcess.run(10000L));
+//        final CompletionStage<Object> integerPromise = FutureConverters.toJava(ask(this.configuredActor, FutureConverters.toScala(supplyAsync), 15000));
 
-        return integerPromise.thenApplyAsync(x -> ok(Json.toJson(x)));
+
+        // Old code
+//        final CompletionStage<Integer> integerPromise = CompletableFuture.supplyAsync(() -> LongRunningProcess.run(10000L), (Executor) myExecutionContext);
+//
+//        final CompletionStage<Integer> integerPromise2 = CompletableFuture.supplyAsync(() -> LongRunningProcess.run(10000L), (Executor) myExecutionContext);
+
+//        return integerPromise.thenApplyAsync(x -> ok(Json.toJson(x)));
+        return (CompletionStage<Result>) TODO;
     }
 }

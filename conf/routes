@@ -3,7 +3,10 @@
 # ~~~~
 
 
-# Home page
+# Old attempts
 GET     /async                      controllers.HomeController.async
 GET     /async2                     controllers.HomeController.async2
 GET     /async3                     controllers.HomeController.async3
+
+# Success
+GET     /new                     controllers.HomeController2.async
